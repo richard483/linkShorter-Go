@@ -17,6 +17,7 @@ func main() {
 	e.GET("/databaseList", getDatabaseList)
 	e.GET("/collectionList", getShortLinkCollectionList)
 	e.POST("/shortLink", insertShortLink)
+	e.POST("/findLink", findShortLink)
 
 	e.Logger.Fatal(e.Start(":1323"))
 }
@@ -41,4 +42,9 @@ func getShortLinkCollectionList(c echo.Context) error {
 func insertShortLink(c echo.Context) error {
 	var createShortLink = controllers.CreateShortLinkCollection(c)
 	return createShortLink
+}
+
+func findShortLink(c echo.Context) error {
+	var findShortLink = controllers.GetShortLinkbyName(c)
+	return findShortLink
 }

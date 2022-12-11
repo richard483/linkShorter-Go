@@ -45,8 +45,31 @@ func GetShortLinkCollection(c echo.Context) error {
 	return c.JSON(http.StatusOK, responses.ShortLinkResponse{Status: http.StatusOK, Message: "success", Data: map[string]interface{}{"data": shortLinks}})
 }
 
+func GetShortLinkbyName(c echo.Context) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	shortLink := new(models.ShortLink)
+
+	defer cancel()
+
+	if err := c.Bind(&shortLink); err != nil {
+		return c.JSON(http.StatusBadRequest, responses.ShortLinkResponse{Status: http.StatusBadRequest, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
+	}
+
+	defer cancel()
+
+	err := shortLinkCollection.FindOne(ctx, bson.M{"name": shortLink.Name}).Decode(&shortLink)
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, responses.ShortLinkResponse{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
+	}
+
+	return c.JSON(http.StatusOK, responses.ShortLinkResponse{Status: http.StatusOK, Message: "success", Data: map[string]interface{}{"data": shortLink}})
+
+}
+
 func CreateShortLinkCollection(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+
 	shortLink := new(models.ShortLink)
 
 	defer cancel()
@@ -57,6 +80,12 @@ func CreateShortLinkCollection(c echo.Context) error {
 
 	if validateError := validate.Struct(shortLink); validateError != nil {
 		return c.JSON(http.StatusBadRequest, responses.ShortLinkResponse{Status: http.StatusBadRequest, Message: "error", Data: map[string]interface{}{"data": validateError.Error()}})
+	}
+
+	err := shortLinkCollection.FindOne(ctx, bson.M{"name": shortLink.Name}).Decode(&shortLink)
+
+	if err == nil {
+		return c.JSON(http.StatusInternalServerError, responses.ShortLinkResponse{Status: http.StatusBadRequest, Message: "error", Data: map[string]interface{}{"data": "found duplicate name"}})
 	}
 
 	newShortLink := models.ShortLink{
