@@ -1,9 +1,14 @@
-package src
+package controllers
 
-import "math/rand"
+import (
+	"math/rand"
+	"net/http"
 
-func RandomString() string {
+	"github.com/labstack/echo/v4"
+)
+
+func RandomString(c echo.Context) error {
 	var str = []string{"Hello", "Kamusta", "Xin chào", "Bonjour", "你好", "こんにちは", "안녕하십니까", "Hallo", "Merhaba", "Ciao", "Hola", "Привет", "Olá", "नमस्ते"}
-	return str[rand.Intn(13)]
+	return c.String(http.StatusOK, str[rand.Intn(13)])
 
 }

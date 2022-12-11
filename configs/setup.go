@@ -1,16 +1,19 @@
 package configs
 
 import (
+	"LinkShorter/responses"
 	"context"
 	"log"
+	"net/http"
 	"time"
 
+	"github.com/labstack/echo/v4"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func connectDB() *mongo.Client {
+func ConnectDB() *mongo.Client {
 	client, err := mongo.NewClient(options.Client().ApplyURI(EnvMongoURI()))
 
 	if err != nil {
@@ -28,21 +31,22 @@ func connectDB() *mongo.Client {
 	return client
 }
 
-var DB *mongo.Client = connectDB()
+var DB *mongo.Client = ConnectDB()
 
 func GetCollection(client *mongo.Client, collectionName string) *mongo.Collection {
 	collection := client.Database("nephrenWeb").Collection(collectionName)
 	return collection
 }
 
-func GetDatabaseList(client *mongo.Client) []string {
+func GetDatabaseList(c echo.Context) error {
+
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 
-	database, err := client.ListDatabaseNames(ctx, bson.M{})
+	database, err := DB.ListDatabaseNames(ctx, bson.M{})
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	return database
+	return c.JSON(http.StatusOK, responses.ShortLinkResponse{Status: http.StatusOK, Message: "success", Data: map[string]interface{}{"data": database}})
 }
