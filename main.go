@@ -16,12 +16,14 @@ func main() {
 	e.GET("/", index)
 	e.GET("/databaseList", getDatabaseList)
 	e.GET("/collectionList", getShortLinkCollectionList)
+	e.POST("/shortLink", insertShortLink)
 
 	e.Logger.Fatal(e.Start(":1323"))
 }
 
 func index(c echo.Context) error {
-	return controllers.RandomString(c)
+	var randomhello = controllers.RandomString(c)
+	return randomhello
 }
 
 func getDatabaseList(c echo.Context) error {
@@ -32,5 +34,11 @@ func getDatabaseList(c echo.Context) error {
 }
 
 func getShortLinkCollectionList(c echo.Context) error {
-	return controllers.GetShortLinkCollection(c)
+	var getShortLinkCollection = controllers.GetShortLinkCollection(c)
+	return getShortLinkCollection
+}
+
+func insertShortLink(c echo.Context) error {
+	var createShortLink = controllers.CreateShortLinkCollection(c)
+	return createShortLink
 }
