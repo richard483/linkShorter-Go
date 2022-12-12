@@ -14,10 +14,15 @@ func main() {
 	configs.ConnectDB()
 
 	e.GET("/", index)
-	e.GET("/databaseList", getDatabaseList)
-	e.GET("/collectionList", getShortLinkCollectionList)
+
+	e.GET("/dbList", getDatabaseList)
+	e.GET("/collList", getShortLinkCollectionList)
+
 	e.POST("/shortLink", insertShortLink)
-	e.POST("/findLink", findShortLink)
+	e.GET("/shortLink", goToPage)
+
+	e.POST("/getLink", getShortLink)
+	e.POST("/go", goToPage)
 
 	e.Logger.Fatal(e.Start(":1323"))
 }
@@ -44,7 +49,12 @@ func insertShortLink(c echo.Context) error {
 	return createShortLink
 }
 
-func findShortLink(c echo.Context) error {
-	var findShortLink = controllers.GetShortLinkbyName(c)
-	return findShortLink
+func getShortLink(c echo.Context) error {
+	var getShortLink = controllers.GetShortLinkDatabyName(c)
+	return getShortLink
+}
+
+func goToPage(c echo.Context) error {
+	var gotoPage = controllers.GoToPage(c)
+	return gotoPage
 }

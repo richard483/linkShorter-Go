@@ -21,7 +21,10 @@ func ConnectDB() *mongo.Client {
 
 	}
 
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+
+	defer cancel()
+
 	err = client.Connect(ctx)
 
 	if err != nil {
@@ -34,13 +37,15 @@ func ConnectDB() *mongo.Client {
 var DB *mongo.Client = ConnectDB()
 
 func GetCollection(client *mongo.Client, collectionName string) *mongo.Collection {
-	collection := client.Database("nephrenWeb").Collection(collectionName)
+	collection := client.Database(EnvMongoDB()).Collection(collectionName)
 	return collection
 }
 
 func GetDatabaseList(c echo.Context) error {
 
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+
+	defer cancel()
 
 	database, err := DB.ListDatabaseNames(ctx, bson.M{})
 

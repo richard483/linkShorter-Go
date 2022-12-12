@@ -45,7 +45,21 @@ func GetShortLinkCollection(c echo.Context) error {
 	return c.JSON(http.StatusOK, responses.ShortLinkResponse{Status: http.StatusOK, Message: "success", Data: map[string]interface{}{"data": shortLinks}})
 }
 
-func GetShortLinkbyName(c echo.Context) error {
+func GetShortLinkbyName(c echo.Context, name string) *models.ShortLink {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	var shortLink = new(models.ShortLink)
+
+	defer cancel()
+
+	err := shortLinkCollection.FindOne(ctx, bson.M{"name": name}).Decode(&shortLink)
+
+	if err != nil {
+		return nil
+	}
+	return shortLink
+}
+
+func GetShortLinkDatabyName(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	shortLink := new(models.ShortLink)
 
